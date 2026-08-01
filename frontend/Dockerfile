@@ -7,7 +7,12 @@ FROM nginx:1.27-alpine
 
 COPY . /usr/share/nginx/html
 COPY docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
+
+# Strip any Windows-style \r line endings that may have been introduced
+# by Git checking out on Windows (belt-and-braces alongside .gitattributes,
+# which should prevent this at the source — but this makes the image
+# build itself immune regardless of how the file arrived).
+RUN sed -i 's/\r$//' /docker-entrypoint.sh && chmod +x /docker-entrypoint.sh
 
 EXPOSE 80
 

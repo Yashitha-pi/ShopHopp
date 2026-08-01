@@ -1,0 +1,13 @@
+# k8s/local/backend-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: shopfront-backend-svc
+spec:
+  type: NodePort
+  selector:
+    app: shopfront-backend
+  ports:
+    - port: 5000
+      targetPort: 5000
+      nodePort: 30500

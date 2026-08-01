@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your orders — Shopfront</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a class="navbar-logo" href="index.html">Shopfront<span class="dot">.</span></a>
+      <div class="navbar-links">
+        <a href="index.html">Home</a>
+        <a href="products.html">Products</a>
+        <a href="cart.html">Cart</a>
+        <a href="orders.html">Orders</a>
+      </div>
+      <div class="navbar-right">
+        <a class="cart-link" href="cart.html">
+          Cart
+          <span class="cart-badge" id="cart-count-badge" style="display:none;">0</span>
+        </a>
+        <div id="navbar-user-slot" style="display:flex; gap:8px;"></div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="page-header">
+      <div class="eyebrow">History</div>
+      <h2>Your orders</h2>
+      <p class="subtitle">Every completed checkout, most recent first.</p>
+    </div>
+
+    <div id="orders-list"></div>
+  </div>
+
+  <footer class="footer">Shopfront — a demo storefront for testing and learning.</footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/orders.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+# k8s/local/frontend-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: shopfront-frontend-svc
+spec:
+  type: NodePort
+  selector:
+    app: shopfront-frontend
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30080

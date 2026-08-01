@@ -1,0 +1,63 @@
+# k8s/local/backend-deployment.yaml
+#
+# For running on Minikube (e.g. your own laptop) instead of a cloud VM.
+# Key differences from k8s/backend-deployment.yaml:
+#   - image is a local tag, built directly into Minikube's Docker daemon
+#     (see k8s/local/README.md) — no registry push needed.
+#   - imagePullPolicy: Never tells Kubernetes "don't try to pull this,
+#     it's already on the node."
+#   - FRONTEND_ORIGIN starts as a placeholder — you'll patch it with the
+#     real ngrok URL after starting the tunnel (see README), since you
+#     can't know the ngrok URL before it exists.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shopfront-backend
+  labels:
+    app: shopfront-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shopfront-backend
+  template:
+    metadata:
+      labels:
+        app: shopfront-backend
+    spec:
+      containers:
+        - name: backend
+          image: shopfront-backend:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 5000
+          env:
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: shopfront-secrets
+                  key: secret-key
+            - name: FRONTEND_ORIGIN
+              value: "http://localhost:8080"   # placeholder — patch after ngrok is up
+            - name: COOKIE_CROSS_SITE
+              value: "1"
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 20

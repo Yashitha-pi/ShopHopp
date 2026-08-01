@@ -1,0 +1,60 @@
+# k8s/backend-deployment.yaml
+#
+# NOTE for the MLOps pipeline this feeds: `resources.requests/limits`
+# below are hand-set placeholders. In the finished pipeline, your
+# generate_k8s_yaml.py script will overwrite these two blocks with the
+# ML model's predicted CPU/Memory before `kubectl apply` runs — nothing
+# else in this file should need to change.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shopfront-backend
+  labels:
+    app: shopfront-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shopfront-backend
+  template:
+    metadata:
+      labels:
+        app: shopfront-backend
+    spec:
+      containers:
+        - name: backend
+          # Replace with your pushed image, e.g.:
+          #   docker.io/<your-dockerhub-username>/shopfront-backend:latest
+          image: <YOUR_REGISTRY>/shopfront-backend:latest
+          ports:
+            - containerPort: 5000
+          env:
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: shopfront-secrets
+                  key: secret-key
+            - name: FRONTEND_ORIGIN
+              value: "http://<VM_PUBLIC_IP>:30080"
+            - name: COOKIE_CROSS_SITE
+              value: "1"
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 20

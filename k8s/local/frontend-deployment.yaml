@@ -1,0 +1,33 @@
+# k8s/local/frontend-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shopfront-frontend
+  labels:
+    app: shopfront-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shopfront-frontend
+  template:
+    metadata:
+      labels:
+        app: shopfront-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: shopfront-frontend:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+          env:
+            - name: API_BASE_URL
+              value: "http://localhost:5000/api"   # placeholder — patch after ngrok is up
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "64Mi"
+            limits:
+              cpu: "250m"
+              memory: "128Mi"

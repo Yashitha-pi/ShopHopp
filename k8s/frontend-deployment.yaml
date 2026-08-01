@@ -1,0 +1,37 @@
+# k8s/frontend-deployment.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shopfront-frontend
+  labels:
+    app: shopfront-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shopfront-frontend
+  template:
+    metadata:
+      labels:
+        app: shopfront-frontend
+    spec:
+      containers:
+        - name: frontend
+          # Replace with your pushed image, e.g.:
+          #   docker.io/<your-dockerhub-username>/shopfront-frontend:latest
+          image: <YOUR_REGISTRY>/shopfront-frontend:latest
+          ports:
+            - containerPort: 80
+          env:
+            # Must match the backend's externally reachable address —
+            # i.e. the same VM_PUBLIC_IP:30500 used in backend-service.yaml.
+            - name: API_BASE_URL
+              value: "http://<VM_PUBLIC_IP>:30500/api"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "64Mi"
+            limits:
+              cpu: "250m"
+              memory: "128Mi"

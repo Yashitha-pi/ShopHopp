@@ -1,0 +1,19 @@
+# k8s/backend-service.yaml
+#
+# NodePort exposes the backend on the same fixed port (30500) on every
+# node's public IP — the simplest way to reach it from outside a
+# single-VM cluster with no cloud LoadBalancer available. Switch to
+# type: LoadBalancer if you deploy to a cloud provider that supports one.
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: shopfront-backend-svc
+spec:
+  type: NodePort
+  selector:
+    app: shopfront-backend
+  ports:
+    - port: 5000
+      targetPort: 5000
+      nodePort: 30500

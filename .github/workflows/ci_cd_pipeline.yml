@@ -1,0 +1,38 @@
+name: Build and Deploy Shopfront
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Point Docker at Minikube
+        run: |
+          & minikube -p minikube docker-env --shell powershell | Invoke-Expression
+
+      - name: Build backend image
+        run: |
+          cd backend
+          docker build -t shopfront-backend:latest .
+
+      - name: Build frontend image
+        run: |
+          cd frontend
+          docker build -t shopfront-frontend:latest .
+
+      - name: Restart backend deployment
+        run: kubectl rollout restart deployment/shopfront-backend
+
+      - name: Restart frontend deployment
+        run: kubectl rollout restart deployment/shopfront-frontend
+
+      - name: Wait for rollout
+        run: |
+          kubectl rollout status deployment/shopfront-backend
+          kubectl rollout status deployment/shopfront-frontend

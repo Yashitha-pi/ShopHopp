@@ -12,19 +12,11 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Point Docker at Minikube
-        run: |
-          & minikube -p minikube docker-env --shell powershell | Invoke-Expression
-
       - name: Build backend image
-        run: |
-          cd backend
-          docker build -t shopfront-backend:latest .
+        run: minikube image build -t shopfront-backend:latest ./backend
 
       - name: Build frontend image
-        run: |
-          cd frontend
-          docker build -t shopfront-frontend:latest .
+        run: minikube image build -t shopfront-frontend:latest ./frontend
 
       - name: Restart backend deployment
         run: kubectl rollout restart deployment/shopfront-backend

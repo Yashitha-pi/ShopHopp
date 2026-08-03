@@ -11,20 +11,67 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for all branches and tags
+
+      # NEW — decides whether this push touched frontend/ at all. On a
+      # brand-new branch or a force-push, github.event.before is all
+      # zeros and there's nothing to diff against, so we default to
+      # "changed" (build everything) rather than risk skipping a real
+      # frontend change.
+      - name: Detect changed paths
+        id: changes
+        shell: pwsh
+        run: |
+          $before = "${{ github.event.before }}"
+          if ($before -eq "0000000000000000000000000000000000000000" -or [string]::IsNullOrEmpty($before)) {
+            Write-Host "No previous commit to diff against - building everything"
+            echo "frontend_changed=true" >> $env:GITHUB_OUTPUT
+            exit 0
+          }
+          $changed = git diff --name-only $before ${{ github.sha }}
+          Write-Host "Changed files:`n$changed"
+          $frontendChanged = $changed | Where-Object { $_ -like "frontend/*" }
+          if ($frontendChanged) {
+            echo "frontend_changed=true" >> $env:GITHUB_OUTPUT
+          } else {
+            Write-Host "No changes under frontend/ - skipping frontend build/deploy"
+            echo "frontend_changed=false" >> $env:GITHUB_OUTPUT
+          }
+
+      - name: Predict resources and generate K8s manifest
+        run: |
+          python C:\Users\Admin\ml_resource_predictor\fill_template_from_api.py `
+            --api-url "http://127.0.0.1:30800" `
+            --clone-url "https://github.com/yashitha-pi/ShopHopp.git" `
+            --repo-name "ShopHopp" `
+            --branch "main" `
+            --template "${{ github.workspace }}\k8s\local\backend-deployment.template.yaml" `
+            --output "${{ github.workspace }}\k8s\local\backend-deployment.yaml"
 
       - name: Build backend image
         run: minikube image build -t shopfront-backend:latest ./backend
 
+      # NEW — gated with `if:`
       - name: Build frontend image
+        if: steps.changes.outputs.frontend_changed == 'true'
         run: minikube image build -t shopfront-frontend:latest ./frontend
+
+      - name: Apply generated backend manifest (predicted resources)
+        run: kubectl apply -f k8s/local/backend-deployment.yaml
 
       - name: Restart backend deployment
         run: kubectl rollout restart deployment/shopfront-backend
 
+      # NEW — gated with `if:`
       - name: Restart frontend deployment
+        if: steps.changes.outputs.frontend_changed == 'true'
         run: kubectl rollout restart deployment/shopfront-frontend
 
-      - name: Wait for rollout
-        run: |
-          kubectl rollout status deployment/shopfront-backend
-          kubectl rollout status deployment/shopfront-frontend
+      - name: Wait for backend rollout
+        run: kubectl rollout status deployment/shopfront-backend
+
+      # NEW — gated with `if:`
+      - name: Wait for frontend rollout
+        if: steps.changes.outputs.frontend_changed == 'true'
+        run: kubectl rollout status deployment/shopfront-frontend

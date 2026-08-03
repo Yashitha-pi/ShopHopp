@@ -44,11 +44,11 @@ spec:
               value: "1"
           resources:
             requests:
-              cpu: "250m"
-              memory: "256Mi"
+              cpu: "{{CPU_REQUEST}}"
+              memory: "{{MEMORY_REQUEST}}"
             limits:
-              cpu: "500m"
-              memory: "512Mi"
+              cpu: "{{CPU_LIMIT}}"
+              memory: "{{MEMORY_LIMIT}} "
           readinessProbe:
             httpGet:
               path: /health

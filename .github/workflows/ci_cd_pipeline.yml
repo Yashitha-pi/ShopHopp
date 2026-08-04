@@ -21,7 +21,7 @@ jobs:
       # frontend change.
       - name: Detect changed paths
         id: changes
-        shell: pwsh
+        shell: powershell
         run: |
           $before = "${{ github.event.before }}"
           if ($before -eq "0000000000000000000000000000000000000000" -or [string]::IsNullOrEmpty($before)) {

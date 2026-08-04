@@ -41,7 +41,7 @@ jobs:
 
       - name: Predict resources and generate K8s manifest
         run: |
-          python C:\Users\Admin\ml_resource_predictor\fill_template_from_api.py `
+            python "C:\Users\Admin\OneDrive\Documents\YASHITHA\Projects\IntelliScale\IntelliScale\fill_template_from_api.py" `
             --api-url "http://127.0.0.1:30800" `
             --clone-url "https://github.com/yashitha-pi/ShopHopp.git" `
             --repo-name "ShopHopp" `

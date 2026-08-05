@@ -44,20 +44,24 @@ spec:
               value: "1"
           resources:
             requests:
-              cpu: "{{CPU_REQUEST}}"
-              memory: "{{MEMORY_REQUEST}}"
+              cpu: "860m"
+              memory: "1024Mi"
             limits:
-              cpu: "{{CPU_LIMIT}}"
-              memory: "{{MEMORY_LIMIT}}"
+              cpu: "1290m"
+              memory: "1536Mi"
           readinessProbe:
             httpGet:
               path: /health
               port: 5000
             initialDelaySeconds: 5
             periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3   
           livenessProbe:
             httpGet:
               path: /health
               port: 5000
             initialDelaySeconds: 10
             periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 5

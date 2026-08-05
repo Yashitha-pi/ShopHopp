@@ -6,6 +6,7 @@
 FROM nginx:1.27-alpine
 
 COPY . /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 
 # Strip any Windows-style \r line endings that may have been introduced

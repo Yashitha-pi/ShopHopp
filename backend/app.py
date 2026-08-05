@@ -20,6 +20,7 @@ from routes.products import products_bp
 from routes.cart import cart_bp
 from routes.orders import orders_bp
 from routes.admin import admin_bp
+import concurrency_middleware
 
 
 def create_app():
@@ -104,6 +105,13 @@ def create_app():
         before pulling deeper runtime metrics.
         """
         return jsonify({"status": "healthy"}), 200
+
+    # --- IntelliScale dashboard support --------------------------------------
+    # Registers before_request/after_request hooks that track in-flight
+    # requests + a rolling 60s request/error rate, and adds
+    # GET /api/metrics/concurrency which the dashboard polls. See
+    # concurrency_middleware.py's docstring for the multi-worker caveat.
+    concurrency_middleware.register(app)
 
     return app
 

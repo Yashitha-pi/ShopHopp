@@ -25,4 +25,4 @@ EXPOSE 5000
 # many workers are configured — without it, each worker independently
 # imports app.py and races to create/seed the same SQLite file, which
 # crashes with "table already exists".
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "--preload", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "--threads", "2", "--timeout", "30", "--preload", "app:app"]

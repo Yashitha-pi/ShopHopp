@@ -23,7 +23,7 @@ spec:
             - containerPort: 80
           env:
             - name: API_BASE_URL
-              value: "http://localhost:5000/api"   # placeholder — patch after ngrok is up
+              value: "/api"   # placeholder — patch after ngrok is up
           resources:
             requests:
               cpu: "100m"
